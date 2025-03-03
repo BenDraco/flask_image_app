@@ -1,0 +1,86 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<!-- Заголовок страницы -->
+{% block title %}Обработка изображения{% endblock %}
+
+<!-- Блок content -->
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Обработка изображения</h1>
+
+    <!-- Форма загрузки изображения -->
+    <div class="card mb-5">
+        <div class="card-body">
+            {{ wtf.quick_form(form, method='post', enctype="multipart/form-data", action="/", button_map={"submit": "primary"}) }}
+        </div>
+    </div>
+
+    <!-- Отображение результатов -->
+    {% if original_image or upped_image or reduced_image or pixel_difference %}
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            Результаты обработки
+        </div>
+        <div class="card-body">
+            <!-- Оригинальное изображение -->
+            {% if original_image %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h5>Начальное изображение:</h5>
+                        <img src="{{ url_for('static', filename=original_image[7:]) }}" class="img-fluid rounded" alt="Original Image">
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Измененное изображение -->
+            {% if upped_image %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h5>Обработанное изображение:</h5>
+                        <img src="{{ url_for('static', filename=upped_image[7:]) }}" class="img-fluid rounded" alt="Upped Image">
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Возвращенное к исходному масштабу изображение -->
+            {% if reduced_image %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h5>Возвращенное к исходному масштабу изображение:</h5>
+                        <img src="{{ url_for('static', filename=reduced_image[7:]) }}" class="img-fluid rounded" alt="Reduced Image">
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Суммарная абсолютная разность пикселей -->
+            {% if pixel_difference is not none %}
+                <div class="alert alert-info">
+                    <strong>Суммарная абсолютная разность пикселей:</strong> {{ pixel_difference }}
+                </div>
+            {% endif %}
+
+            <!-- График распределения цветов для начального изображения -->
+            {% if plot_image_original and graph_toggle in ['both', 'original'] %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h5>График распределения цветов (начальное изображение):</h5>
+                        <img src="{{ url_for('static', filename=plot_image_original[7:]) }}" class="img-fluid rounded" alt="Color Distribution (Original)">
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- График распределения цветов для обработанного изображения -->
+            {% if plot_image_upped and graph_toggle in ['both', 'upped'] %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h5>График распределения цветов (обработанное изображение):</h5>
+                        <img src="{{ url_for('static', filename=plot_image_upped[7:]) }}" class="img-fluid rounded" alt="Color Distribution (Upped)">
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
